@@ -1,0 +1,165 @@
+
+
+
+
+---
+
+enable password encryption
+
+enable command logging
+
+
+
+
+config traffic control [l3] broadcast enable multicast enable unicast enable action shutdown count 5
+config traffic control auto_recover_time 60
+
+
+
+enable loopdetect
+config loopdetect recover_timer 3600 
+config loopdetect lbd_recover_time 3600
+config loopdetect port [l2 l3 trunk] state enabled
+enable loopdetect
+
+
+
+config traffic_segmentation {clientPorts} forward_list {uplinkPorts}
+
+
+
+
+config ports {clientPorts} state disable
+
+<ports>
+
+config snmp linkchange_traps ports {clientPorts} disable
+
+*config snmp system_name* {domainName}
+
+*config snmp system_location* {system_location}
+ 
+ 
+config vlan default delete {clientPorts}
+
+*create vlan "control"*
+*create vlan control*
+*config vlan "default" tag*
+*config vlan default tag*
+*config vlan "default" untag*
+*config vlan default untag*
+
+<vlans>
+
+config port_vlan {uplinkPorts} pvid {controlVlanID}
+
+config gvrp {uplinkPorts} pvid {controlVlanID}
+
+
+
+
+enable port_security trap_log
+
+config port_security ports [l3] admin_state enable
+
+
+
+config pppoe circuit_id_insertion state enable
+config pppoe circuit_id_insertion ports {uplinkPorts} state disable
+
+
+
+config filter dhcp_server ports [l3] state enable
+config filter dhcp_server illegal_server_log_suppress_duration 30min
+config filter dhcp_server trap_log enable
+
+
+
+
+{STP(enable/disable)} stp
+
+config stp fbpdu disable
+
+config stp ports {clientPorts} edge auto state disable
+
+config stp ports {uplinkPorts} externalCost 1
+
+config stp ports {totalPortsRange} fbpdu disable
+config stp ports {clientPorts} restricted_role true
+config stp ports {clientPorts} restricted_tcn true
+
+{STP(enable/disable)} stp
+
+
+
+config safeguard_engine state enable
+config safeguard_engine state enable utilization rising 80 falling 70 trap_log enable
+
+
+
+
+*config command_prompt* {domainName}
+
+
+
+
+enable igmp_snooping
+
+enable igmp_snooping multicast_vlan
+
+*create igmp_snooping multicast_vlan IPTV* {vlanIPTV}
+*create igmp_snooping multicast_vlan "IPTV"* {vlanIPTV}
+
+config igmp_snooping multicast_vlan IPTV state enable 
+
+*config igmp_snooping multicast_vlan IPTV replace_source_ip* {ip}
+*config igmp_snooping multicast_vlan "IPTV" replace_source_ip* {ip}
+
+config igmp_snooping multicast_vlan IPTV add source_port {uplinkPorts}
+
+
+
+enable dos_prevention trap_log
+config dos_prevention dos_type land_attack state disable 
+config dos_prevention dos_type blat_attack state disable 
+config dos_prevention dos_type tcp_null_scan state disable 
+config dos_prevention dos_type tcp_xmasscan state disable 
+config dos_prevention dos_type tcp_synfin state disable 
+config dos_prevention dos_type tcp_syn_srcport_less_1024 state disable 
+config dos_prevention dos_type ping_death_attack state disable 
+config dos_prevention dos_type tcp_tiny_frag_attack state disable
+config dos_prevention log enable
+
+
+
+enable jumbo_frame
+*config ipif System ipaddress* {ip}{/prefix}
+*config ipif System vlan* {vlanNameControl}
+
+
+
+
+enable lldp
+
+config lldp ports {totalPortsRange} admin_status tx_and_rx
+
+config lldp ports {uplinkPorts} notification enable
+
+config lldp ports {uplinkPorts} basic_tlvs port_description system_name system_description system_capabilities enable
+
+enable lldp
+
+
+config ethernet_oam ports {opticalPorts} state enable
+
+config duld ports {opticalPorts} state enable
+
+
+config gratuitous_arp send periodically ipif System interval 20
+
+
+
+*create iproute* default {gateway}
+
+
+save
