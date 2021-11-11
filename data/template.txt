@@ -42,8 +42,8 @@ config snmp linkchange_traps ports {clientPorts} disable
  
 config vlan default delete {clientPorts}
 
-*create vlan "control"*
-*create vlan control*
+*config vlan "control"*
+*config vlan control*
 *config vlan "default" tag*
 *config vlan default tag*
 *config vlan "default" untag*
