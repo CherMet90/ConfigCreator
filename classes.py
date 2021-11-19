@@ -13,8 +13,10 @@ class Port:
         self.service = service_type
 
     def create_port(self):
-        command = 'config ports ' + self.number + ' state enable description "' + self.description + '"\n'
-        return command
+        if ' ' in self.description:
+            return f'config ports {self.number} state enable\nconfig ports {self.number} description "{self.description}"\n'
+        else:
+            return f'config ports {self.number} state enable\nconfig ports {self.number} description {self.description}\n'
 
     def addServiceType(self, service_type: str):
         self.service = service_type

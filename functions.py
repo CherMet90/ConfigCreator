@@ -10,7 +10,7 @@ def prepare(origin):
     vlanList = []
     vlanKeys = ['VlanName', 'VlanID', 'untag', 'tag']
     
-    if origin is not 'new':
+    if origin != 'new':
         with open('data/' + origin, 'r') as file:
             for line in file:
                 matchSingle = re.search(
@@ -56,6 +56,8 @@ def prepare(origin):
         writer.writeheader()
         for i in vlanList:
             writer.writerow({vlanKeys[0]: i.name, vlanKeys[1]: i.vlan_id, vlanKeys[2]: i.untagged, vlanKeys[3]: i.tagged})
+            
+    return vlanList
 
 def getMarks(template, mark, origin=''):
     if mark == '[]':
@@ -79,9 +81,12 @@ def getMarks(template, mark, origin=''):
                             counter += 1
                     if counter == 0:
                         template = template.replace(lineTemplate, '\n')
-                            
-                
         return template
+        
+def controlVlanSearch(list):
+    for i in list:
+        if i.name == 'control':
+            print(f'control vlanid {i.vlan_id}')
                     
     
 '''        

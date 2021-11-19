@@ -11,7 +11,7 @@ enable command logging
 
 
 
-config traffic control [l3] broadcast enable multicast enable unicast enable action shutdown count 5
+config traffic control [l3] broadcast enable multicast enable thres 64 action shutdown count 5
 config traffic control auto_recover_time 60
 
 
@@ -19,12 +19,18 @@ config traffic control auto_recover_time 60
 enable loopdetect
 config loopdetect recover_timer 3600 
 config loopdetect lbd_recover_time 3600
-config loopdetect port [l2 l3 trunk] state enabled
+config loopdetect port [l2 l3 trunk] state enable
 enable loopdetect
 
 
 
-config traffic_segmentation {clientPorts} forward_list {uplinkPorts}
+
+
+
+
+
+
+config traffic_segmentation {clientPorts} forward_list [uplink]
 
 
 
@@ -40,7 +46,7 @@ config snmp linkchange_traps ports {clientPorts} disable
 *config snmp system_location* {system_location}
  
  
-config vlan default delete {clientPorts}
+config vlan default delete [l2 l3 trunk]
 
 *config vlan "control"*
 *config vlan control*
@@ -51,21 +57,24 @@ config vlan default delete {clientPorts}
 
 <vlans>
 
-config port_vlan {uplinkPorts} pvid {controlVlanID}
+config port_vlan [sw uplink] pvid {controlVlanID}
 
-config gvrp {uplinkPorts} pvid {controlVlanID}
+config gvrp [sw uplink] pvid {controlVlanID}
 
 
 
 
 enable port_security trap_log
 
-config port_security ports [l3] admin_state enable
+config port_sec ports {totalPortsRange} lock deleteontimeout
+config port_sec ports {totalPortsRange} lock DeleteOnTimeout
+
+config port_security ports [l3] admin_state enable max 4
 
 
 
 config pppoe circuit_id_insertion state enable
-config pppoe circuit_id_insertion ports {uplinkPorts} state disable
+config pppoe circuit_id_insertion ports [sw uplink] state disable
 
 
 
@@ -82,13 +91,21 @@ config stp fbpdu disable
 
 config stp ports {clientPorts} edge auto state disable
 
-config stp ports {uplinkPorts} externalCost 1
+config stp ports [uplink] externalCost 1
 
 config stp ports {totalPortsRange} fbpdu disable
 config stp ports {clientPorts} restricted_role true
 config stp ports {clientPorts} restricted_tcn true
 
 {STP(enable/disable)} stp
+
+
+
+*create iproute* default {gateway}
+
+
+
+config bpdu_protection ports [l3] st en mode drop
 
 
 
@@ -115,7 +132,15 @@ config igmp_snooping multicast_vlan IPTV state enable
 *config igmp_snooping multicast_vlan IPTV replace_source_ip* {ip}
 *config igmp_snooping multicast_vlan "IPTV" replace_source_ip* {ip}
 
-config igmp_snooping multicast_vlan IPTV add source_port {uplinkPorts}
+config igmp_snooping multicast_vlan IPTV add member_port [l3]
+
+config igmp_snooping multicast_vlan IPTV add source_port [sw uplink]
+
+
+
+
+
+
 
 
 
@@ -136,6 +161,8 @@ enable jumbo_frame
 *config ipif System ipaddress* {ip}{/prefix}
 *config ipif System vlan* {vlanNameControl}
 
+*config ipif System ipaddress* {ip}{/prefix}
+*config ipif System vlan* {vlanNameControl}
 
 
 
@@ -143,9 +170,9 @@ enable lldp
 
 config lldp ports {totalPortsRange} admin_status tx_and_rx
 
-config lldp ports {uplinkPorts} notification enable
+config lldp ports [sw uplink] notification enable
 
-config lldp ports {uplinkPorts} basic_tlvs port_description system_name system_description system_capabilities enable
+config lldp ports [sw uplink] basic_tlvs port_description system_name system_description system_capabilities enable
 
 enable lldp
 
@@ -155,7 +182,17 @@ config ethernet_oam ports {opticalPorts} state enable
 config duld ports {opticalPorts} state enable
 
 
+
+config gratuitous_arp send ipif_status_up enable
+config gratuitous_arp send dup_ip_detected enable
+config gratuitous_arp learning enable
 config gratuitous_arp send periodically ipif System interval 20
+config gratuitous_arp send periodically interval 20
+
+
+
+
+
 
 
 
