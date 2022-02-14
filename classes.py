@@ -14,9 +14,9 @@ class Port:
 
     def create_port(self):
         if ' ' in self.description:
-            return f'config ports {self.number} state enable\nconfig ports {self.number} description "{self.description}"\n'
+            return f'config ports {self.number} state enable\nconfig ports {self.number} speed auto description "{self.description}"\n'
         else:
-            return f'config ports {self.number} state enable\nconfig ports {self.number} description {self.description}\n'
+            return f'config ports {self.number} state enable\nconfig ports {self.number} speed auto description {self.description}\n'
 
     def addServiceType(self, service_type: str):
         self.service = service_type

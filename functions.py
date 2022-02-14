@@ -6,9 +6,9 @@ from classes import Port, Vlan
 
 def prepare(origin):
     portList = []
-    portKeys = ['Port', 'Description', 'ServiceType']
+    portKeys = ('Port', 'Description', 'ServiceType')
     vlanList = []
-    vlanKeys = ['VlanName', 'VlanID', 'untag', 'tag']
+    vlanKeys = ('VlanName', 'VlanID', 'untag', 'tag')
     
     if origin != 'new':
         with open('data/' + origin, 'r') as file:
@@ -22,8 +22,8 @@ def prepare(origin):
                     line)
     
                 matchCreate = re.match(r'create vlan "*(?P<name>|[^\"\n\$]*)"* tag (?P<id>\d*)', line)
-                matchUntag = re.match(r'config vlan \S+ add untag\S*(?P<ports> \S+)', line)
-                matchTag = re.match(r'config vlan \S+ add tag\S*(?P<ports> \S+)', line)
+                matchUntag = re.match(r'config vlan [^default]\S+ add untag\S*(?P<ports> \S+)', line)
+                matchTag = re.match(r'config vlan [^default]\S+ add tag\S*(?P<ports> \S+)', line)
                 try:
                     #--- Порты ---
                     if matchSingle is not None and matchRange is None:
@@ -89,8 +89,9 @@ def controlVlanSearch(list):
             print(f'control vlanid {i.vlan_id}')
                     
     
-'''        
-prepare('10.1.6.32.DES-3200-28')
-os.startfile(r'vlans.csv')
-input()
-'''
+if __name__ == '__main__':       
+ 
+    prepare('10.1.6.32.DES-3200-28')
+    os.startfile(r'vlans.csv')
+    input()
+
